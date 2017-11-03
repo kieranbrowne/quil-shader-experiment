@@ -12,7 +12,9 @@ varying vec3 vertLightDir;
 
 void main() {
   gl_Position = transform * position;
-  vertColor = color;
   vertNormal = normalize(normalMatrix * normal);
   vertLightDir = -lightNormal;
+  vertColor = color * vec4(gl_Position.x/500.0 + 0.5,
+          gl_Position.y/10.0 + 0.0,
+          gl_Position.y/500.0 + 0.5, 1.0);
 }
