@@ -6,18 +6,25 @@
   (let [sh (apply q/load-shader files)]
     (doseq [[k v] kv-map]
       (.set sh k v))
+    (.set sh "resolution" 500 500)
     sh))
     
 
 
 (defn setup []
-  {:shader (set-shader {"fraction" (float 1.0)} "Frag.glsl" "Vert.glsl")})
+  {:shader 
+   (set-shader 
+     {"fraction" (float 1.0)} 
+     "Frag.glsl" "Vert.glsl")})
   
 
 
 (defn update-state [state]
   (if (= 0 (mod (q/frame-count) 100))
-    {:shader (set-shader {"fraction" (float 1.0)} "Frag.glsl" "Vert.glsl")}
+    {:shader 
+     (set-shader 
+       {"fraction" (float 1.0)}
+       "Frag.glsl" "Vert.glsl")}
     state))
 
 (defn center []
@@ -46,15 +53,14 @@
 (defn draw-state [state]
   ;; (q/stroke 0 0 0)
   (q/no-stroke)
-  (q/background 255)
-  ;; just yellow shader
+  (q/background 25)
   (q/shader (:shader state))
   (q/directional-light 204 204 200  0 0 -1)
-  (q/lights)
+  ;; (q/rect 0 0 (q/width) (q/height))
   (q/with-translation (center)
     ;; (weird-shape)
     (q/fill 250 00 200)
-    (q/sphere-detail 30)
+    (q/sphere-detail 26)
     (q/sphere 120)))
 
 (q/defsketch shader-test
