@@ -2,66 +2,26 @@
   (:require [quil.core :as q]
             [quil.middleware :as m]))
 
-(defn set-shader [kv-map & files]
-  (let [sh (apply q/load-shader files)]
-    (doseq [[k v] kv-map]
-      (.set sh k v))
-    (.set sh "resolution" 500 500)
-    sh))
-    
-
-
 (defn setup []
-  {:shader 
-   (set-shader 
-     {"fraction" (float 1.0)} 
-     "Frag.glsl" "Vert.glsl")})
+  {:shader (q/load-shader "Frag.glsl")})
   
-
+(defn update-shader [shader]
+  (doto shader 
+    (.set "u_resolution" (float (q/width)) (float (q/height)))
+    (.set "u_mouse" (float (q/mouse-x)) (float (q/mouse-x)))
+    (.set "u_time" (float (/ (q/millis) 1000)))))
 
 (defn update-state [state]
-  (if (= 0 (mod (q/frame-count) 100))
-    {:shader 
-     (set-shader 
-       {"fraction" (float 1.0)}
-       "Frag.glsl" "Vert.glsl")}
-    state))
-
-(defn center []
-  [(+ (/ (q/width) 2) (* (q/sin (/ (q/frame-count) 40)) 18)) 
-   (/ (q/height) 2)])
-
-(defn weird-shape []
-  (q/begin-shape)
-  (q/vertex -100 -100 -100)
-  (q/vertex  100 -100 -100)
-  (q/vertex   0    0  100)
-
-  (q/vertex 100 -100 -100)
-  (q/vertex 100  100 -100)
-  (q/vertex   0    0  100)
-
-  (q/vertex 100 100 -100)
-  (q/vertex 100 100 -100)
-  (q/vertex   0   0  100)
-
-  (q/vertex 100  100 -100)
-  (q/vertex 100 -100 -100)
-  (q/vertex   0    0  100)
-  (q/end-shape :close))
+  (let [shader 
+        (if (= 0 (mod (q/frame-count) 100))
+          (q/load-shader "Frag.glsl")
+          (:shader state))]
+    (update-shader shader)
+    {:shader shader}))
 
 (defn draw-state [state]
-  ;; (q/stroke 0 0 0)
-  (q/no-stroke)
-  (q/background 25)
   (q/shader (:shader state))
-  (q/directional-light 204 204 200  0 0 -1)
-  ;; (q/rect 0 0 (q/width) (q/height))
-  (q/with-translation (center)
-    ;; (weird-shape)
-    (q/fill 250 00 200)
-    (q/sphere-detail 26)
-    (q/sphere 120)))
+  (q/rect 0 0 (q/width) (q/height)))
 
 (q/defsketch shader-test
   :title "Shader tests"
